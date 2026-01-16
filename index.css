@@ -21,6 +21,11 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* 
+ * Tailwind CSS v4 theme customization
+ * These CSS variables define custom colors used throughout the app
+ * See: https://tailwindcss.com/docs/v4-beta
+ */
 @theme {
   --color-primary: #0f172a;
   --color-secondary: #334155;
