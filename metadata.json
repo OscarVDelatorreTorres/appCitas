@@ -1,0 +1,5 @@
+{
+  "name": "Repositorio de Citas del Dr. Oscar De la Torre",
+  "description": "Visualizador de citas académicas conectado a Google Sheets con generación de reportes PDF.",
+  "requestFramePermissions": []
+}
