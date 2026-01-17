@@ -50,17 +50,23 @@ export const fetchCitationData = async (): Promise<Citation[]> => {
     const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase());
     
     // We map the requested columns to the likely CSV headers based on keywords
-    // Keywords are based on the user's description of the columns in Spanish
     const getIndex = (keywords: string[]) => headers.findIndex(h => keywords.some(k => h.includes(k)));
 
     const colMap = {
       year: getIndex(['año', 'year']),
       citedArticle: getIndex(['título del artículo', 'artículo citado', 'titulo']), 
-      articleUrl: getIndex(['url', 'doi', 'link']),
+      // Removed 'link' from articleUrl to prevent it from grabbing "Link citas Google scholar"
+      articleUrl: getIndex(['url', 'doi']),
       citedArticleIndex: getIndex(['índice del artículo', 'indice del', 'index']),
       citingArticle: getIndex(['artículo que cita', 'cita el', 'citing']),
-      maxJournalIndex: getIndex(['indización máxima', 'indizacion', 'max index']),
-      evidenceUrl: getIndex(['evidencia', 'evidence']),
+      // Using stricter keywords for max index to avoid confusion
+      maxJournalIndex: getIndex(['indización máx', 'indizacion max', 'max index']),
+      // Strict check for "Evidencia de indización" to avoid matching "Evidencia cita (pdf)"
+      evidenceUrl: getIndex(['evidencia de ind', 'evidence of ind']),
+      // Explicitly looking for PDF-related keywords
+      pdfUrl: getIndex(['pdf', 'evidencia cita', 'archivo']),
+      // New field for Google Scholar Link
+      scholarUrl: getIndex(['scholar', 'link citas google']),
     };
 
     const data: Citation[] = [];
@@ -78,6 +84,8 @@ export const fetchCitationData = async (): Promise<Citation[]> => {
         citingArticle: row[colMap.citingArticle] || '',
         maxJournalIndex: row[colMap.maxJournalIndex] || '',
         evidenceUrl: row[colMap.evidenceUrl] || '',
+        pdfUrl: row[colMap.pdfUrl] || '',
+        scholarUrl: row[colMap.scholarUrl] || '',
       });
     }
 

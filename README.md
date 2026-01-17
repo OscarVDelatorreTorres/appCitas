@@ -1,20 +1,31 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Repositorio de Citas del Dr. Oscar De la Torre
 
-# Run and deploy your AI Studio app
+Esta aplicación visualiza citas académicas desde un archivo de Google Sheets y permite generar reportes en PDF.
 
-This contains everything you need to run your app locally.
+## Instalación y Ejecución
 
-View your app in AI Studio: https://ai.studio/apps/drive/1Ix9gw4x100O21NqUu4tZOlCo53roOppL
+Este proyecto utiliza **Vite** y **React**. Para ejecutarlo localmente o en un entorno de desarrollo:
 
-## Run Locally
+1.  Asegúrate de tener [Node.js](https://nodejs.org/) instalado.
+2.  Instala las dependencias:
+    ```bash
+    npm install
+    ```
+3.  Ejecuta el servidor de desarrollo:
+    ```bash
+    npm run dev
+    ```
+4.  Abre el navegador en la URL que se muestra (usualmente `http://localhost:5173`).
 
-**Prerequisites:**  Node.js
+## Despliegue en GitHub Pages
 
+1.  Crea un repositorio en GitHub.
+2.  Sube estos archivos.
+3.  En GitHub, ve a **Settings > Pages**.
+4.  Configura la fuente de despliegue (puedes usar GitHub Actions para construir el proyecto Vite).
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Estructura del Proyecto
+
+-   `src/`: Código fuente de React (App.tsx, componentes, servicios).
+-   `index.html`: Punto de entrada HTML.
+-   `vite.config.ts`: Configuración del empaquetador.

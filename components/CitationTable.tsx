@@ -1,6 +1,6 @@
 import React from 'react';
 import { Citation } from '../types';
-import { ExternalLink, BookOpen, Link as LinkIcon } from 'lucide-react';
+import { ExternalLink, BookOpen, Link as LinkIcon, FileText } from 'lucide-react';
 
 interface CitationTableProps {
   citations: Citation[];
@@ -12,7 +12,7 @@ const CitationTable: React.FC<CitationTableProps> = ({ citations }) => {
       <div className="text-center py-12 bg-white rounded-lg shadow border border-dashed border-gray-300">
         <BookOpen className="mx-auto h-12 w-12 text-gray-300" />
         <h3 className="mt-2 text-sm font-medium text-gray-900">No hay citas</h3>
-        <p className="mt-1 text-sm text-gray-500">Selecciona un artículo arriba para ver los detalles.</p>
+        <p className="mt-1 text-sm text-gray-500">Selecciona un artículo y un año válido para ver los detalles.</p>
       </div>
     );
   }
@@ -28,34 +28,73 @@ const CitationTable: React.FC<CitationTableProps> = ({ citations }) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              {/* Column 1: Año */}
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
                 Año
               </th>
+              {/* Column 2: Artículo que cita */}
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Artículo que cita
               </th>
+              {/* Column 3: Indización Máx. (Moved to 3rd position to match PDF) */}
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
-                URL / DOI
+                Indización Máx.
               </th>
+              {/* Column 4: Liga de pdf artículo que cita */}
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                Liga de pdf artículo que cita
+              </th>
+              {/* Column 5: URL o DOI de artículo que cita */}
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                URL o DOI de artículo que cita
+              </th>
+              {/* Column 6: Evidencia de índice revista */}
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">
-                Evidencia de índice de revista que cita
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
-                Indización Revista
+                Evidencia de índice revista
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {sortedCitations.map((citation, index) => (
               <tr key={index} className="hover:bg-gray-50 transition-colors">
+                {/* 1. Año */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
                   {citation.year}
                 </td>
+                
+                {/* 2. Artículo que cita */}
                 <td className="px-6 py-4 text-sm text-gray-900">
                   <div className="line-clamp-2" title={citation.citingArticle}>
                     {citation.citingArticle}
                   </div>
                 </td>
+
+                {/* 3. Indización Máx. */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {citation.maxJournalIndex || '-'}
+                  </span>
+                </td>
+
+                {/* 4. PDF */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-accent">
+                   {citation.pdfUrl ? (
+                    <a 
+                      href={citation.pdfUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center hover:underline"
+                      title="Ver PDF"
+                    >
+                      <FileText className="w-4 h-4 mr-1" />
+                      Ver PDF
+                    </a>
+                  ) : (
+                    <span className="text-gray-400 text-xs">-</span>
+                  )}
+                </td>
+
+                {/* 5. URL / DOI */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-accent">
                   {citation.articleUrl ? (
                     <a 
@@ -71,6 +110,8 @@ const CitationTable: React.FC<CitationTableProps> = ({ citations }) => {
                     <span className="text-gray-400 text-xs">No disponible</span>
                   )}
                 </td>
+
+                {/* 6. Evidencia Indización */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-accent">
                    {citation.evidenceUrl ? (
                     <a 
@@ -86,11 +127,6 @@ const CitationTable: React.FC<CitationTableProps> = ({ citations }) => {
                   ) : (
                     <span className="text-gray-400 text-xs">Sin evidencia</span>
                   )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    {citation.maxJournalIndex || '-'}
-                  </span>
                 </td>
               </tr>
             ))}

@@ -9,10 +9,13 @@ export const generatePDF = (citations: Citation[], articleTitle: string, scholar
     format: 'letter',
   });
 
-  // --- Header ---
+  let nextY = 20;
+
+  // --- Main Header ---
   doc.setFontSize(18);
   doc.setTextColor(40, 40, 40);
   doc.text('Repositorio de Citas del Dr. Oscar De la Torre', 14, 20);
+  nextY = 30;
 
   // --- Sub-header (Article Title) ---
   doc.setFontSize(12);
@@ -20,9 +23,15 @@ export const generatePDF = (citations: Citation[], articleTitle: string, scholar
   
   // Handle long titles by splitting text
   const splitTitle = doc.splitTextToSize(`Artículo Citado: ${articleTitle}`, 180);
-  doc.text(splitTitle, 14, 30);
+  doc.text(splitTitle, 14, nextY);
 
-  let nextY = 30 + (splitTitle.length * 5) + 5;
+  nextY += (splitTitle.length * 5) + 5;
+
+  // --- Citation Count ---
+  doc.setFontSize(11);
+  doc.setTextColor(40, 40, 40);
+  doc.text(`Total de citas en este reporte: ${citations.length}`, 14, nextY);
+  nextY += 7;
 
   // --- Scholar Link ---
   if (scholarUrl) {
@@ -40,24 +49,26 @@ export const generatePDF = (citations: Citation[], articleTitle: string, scholar
   }
 
   // --- Table ---
-  // Updated columns as requested
   const tableColumn = [
     "Año", 
     "Artículo que cita", 
     "Indización Máx.", 
-    "Evidencia de índice de revista que cita", // Link to evidenceUrl
-    "URL o DOI de artículo que cita" // Link to articleUrl
+    "Liga de pdf artículo que cita",
+    "URL o DOI de artículo que cita",
+    "Evidencia de índice revista"
   ];
 
   const tableRows: any[] = [];
 
   citations.forEach(cit => {
+    // Ensure all fields have fallback strings
     const citationData = [
-      cit.year,
-      cit.citingArticle,
-      cit.maxJournalIndex,
-      "evidencia de índice de revista que cita", // Placeholder text, link added via hook
-      cit.articleUrl || '-' // Display URL text, link added via hook
+      cit.year || '',
+      cit.citingArticle || '',
+      cit.maxJournalIndex || '',
+      cit.pdfUrl ? "Ver PDF" : "-",
+      cit.articleUrl || '-',
+      cit.evidenceUrl ? "Ver Evidencia" : "-"
     ];
     tableRows.push(citationData);
   });
@@ -68,43 +79,31 @@ export const generatePDF = (citations: Citation[], articleTitle: string, scholar
     startY: nextY,
     theme: 'grid',
     headStyles: { fillColor: [59, 130, 246] }, // Blue-500
-    styles: { fontSize: 9, cellPadding: 3 },
+    styles: { fontSize: 8, cellPadding: 3 },
     columnStyles: {
-      0: { cellWidth: 15 }, // Año
+      0: { cellWidth: 12 }, // Año
       1: { cellWidth: 'auto' }, // Citing Article
-      2: { cellWidth: 25 }, // Indización
-      3: { cellWidth: 35 }, // Evidencia (Link)
+      2: { cellWidth: 20 }, // Indización
+      3: { cellWidth: 22 }, // PDF (Link)
       4: { cellWidth: 35 }, // URL/DOI (Link)
+      5: { cellWidth: 25 }, // Evidence (Link)
     },
     didDrawCell: (data) => {
-      // Add links to specific columns
-      // data.section === 'body' ensures we are in the table body
-      // data.row.index matches the index in the 'citations' array we iterated over above
-      if (data.section === 'body') {
-        // Safety check: ensure the row index is within bounds of our source array
+      if (data.section === 'body' && data.row && typeof data.row.index === 'number') {
         const citation = citations[data.row.index];
         if (!citation) return;
-        
-        // Column index 3 is "Evidencia de índice..."
-        if (data.column.index === 3 && citation.evidenceUrl) {
-          doc.link(
-            data.cell.x, 
-            data.cell.y, 
-            data.cell.width, 
-            data.cell.height, 
-            { url: citation.evidenceUrl }
-          );
-        }
 
-        // Column index 4 is "URL o DOI..."
+        // PDF URL
+        if (data.column.index === 3 && citation.pdfUrl) {
+          doc.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, { url: citation.pdfUrl });
+        }
+        // Article URL / DOI
         if (data.column.index === 4 && citation.articleUrl) {
-          doc.link(
-            data.cell.x, 
-            data.cell.y, 
-            data.cell.width, 
-            data.cell.height, 
-            { url: citation.articleUrl }
-          );
+          doc.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, { url: citation.articleUrl });
+        }
+        // Evidence URL
+        if (data.column.index === 5 && citation.evidenceUrl) {
+          doc.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, { url: citation.evidenceUrl });
         }
       }
     },
